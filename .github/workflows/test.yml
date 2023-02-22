@@ -58,7 +58,8 @@ jobs:
     needs: [build]
     name: Release some stuff 
     runs-on: ubuntu-latest
-      
+    environment:
+      name: ${{ needs.build.outputs.env_name }}
     steps:
       - name: Deploy
         run: |
