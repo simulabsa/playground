@@ -18,12 +18,13 @@ env:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-
   # First job is build
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    
+
+    outputs:
+      env_name: ${{ steps.branch_check.outputs.env_name }}
       
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -40,27 +41,23 @@ jobs:
           echo "Running on branch ${{ github.ref }}"
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
             # echo "::set-output name=env_name::Production"
-            echo "{env_name}={Production}" >> $GITHUB_OUTPUT
+            echo "env_name=Production" >> "$GITHUB_OUTPUT"
           elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
             # echo "::set-output name=env_name::Test"
-            echo "{env_name}={Test}" >> $GITHUB_OUTPUT
+            echo "env_name=Test" >> "$GITHUB_OUTPUT"
           else
              # echo "::set-output name=env_name::Features"
-             echo "{env_name}={Features}" >> $GITHUB_OUTPUT
+             echo "env_name=Features" >> "$GITHUB_OUTPUT"
           fi         
           
       - name: Use variable setup in previous step
         run: echo "I'm using variable ${{ steps.branch_check.outputs.env_name }}"
         
-    outputs:
-      env_name: ${{ steps.branch_check.outputs.env_name }}
       
   release:
     needs: [build]
     name: Release some stuff 
     runs-on: ubuntu-latest
-    environment: 
-      name: ${{ env.DUMMY_NAME }}
       
     steps:
       - name: Deploy
@@ -68,6 +65,3 @@ jobs:
           echo "I am deploying on environment ${{ needs.build.outputs.env_name }}"
           temp=$(echo "${{ secrets.MY_SECRET }}" | base64)
           echo $temp
-      - name: Deploy2
-        run: |
-          echo "I am deploying on environment ${{ env.DUMMY_NNAME }}"
