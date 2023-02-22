@@ -60,7 +60,7 @@ jobs:
     name: Release some stuff 
     runs-on: ubuntu-latest
     environment: 
-      name: ${{ needs.build.branch_check.outputs.env_name }}
+      name: ${{ env.DUMMY_NAME }}
       
     steps:
       - name: Deploy
@@ -68,3 +68,6 @@ jobs:
           echo "I am deploying on environment ${{ needs.build.outputs.env_name }}"
           temp=$(echo "${{ secrets.MY_SECRET }}" | base64)
           echo $temp
+      - name: Deploy2
+        run: |
+          echo "I am deploying on environment ${{ env.DUMMY_NNAME }}"
